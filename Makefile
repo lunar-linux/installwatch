@@ -8,7 +8,7 @@ PREFIX ?= /usr/local
 
 # End of configurable part
 
-VERSION=0.7.0beta7
+VERSION=0.7.0-lunar-1
 
 CFLAGS ?=
 BINDIR=$(PREFIX)/bin
@@ -43,8 +43,11 @@ uninstall:
 clean:
 	rm -f *~ *.bak *.o installwatch.so core localdecls.h libctest test-installwatch
 
-tarball: clean
-	tar -czvC .. -f ../installwatch-$(VERSION).tar.gz installwatch-$(VERSION)
+tag:
+	git tag v$(VERSION)
+
+dist:
+	git archive --format=tar --prefix="installwatch-$(VERSION)/" v$(VERSION) | xz > installwatch-$(VERSION).tar.xz
 
 test: installwatch.so
 	gcc -DLIBDIR=\".\" -Wall -DVERSION=\"$(VERSION)\" -o test-installwatch test-installwatch.c -ldl
