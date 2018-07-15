@@ -1711,9 +1711,9 @@ static int instw_setpathrel(instw_t *instw, int dirfd, const char *relpath) {
 	snprintf(proc_path, PROC_PATH_LEN, "/proc/self/fd/%d", dirfd);
 	if(true_stat(proc_path, &s) == -1)
 		goto out;
-	if(!(newpath = malloc(s.st_size+strlen(relpath)+2)))
+	if(!(newpath = malloc(PATH_MAX+strlen(relpath)+2)))
 		goto out;
-	if((l = true_readlink(proc_path, newpath, s.st_size)) == -1)
+	if((l = true_readlink(proc_path, newpath, PATH_MAX)) == -1)
 		goto free_out;
 	newpath[l] = '/';
 	strcpy(newpath + l + 1, relpath);
