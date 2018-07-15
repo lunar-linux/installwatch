@@ -1,0 +1,11 @@
+# Generic
+*~
+*.swp
+*.out
+
+# Compiled source
+*.o
+*.so
+
+# Generated files
+localdecls.h
