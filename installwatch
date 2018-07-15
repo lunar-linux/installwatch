@@ -14,7 +14,6 @@ if test "$PREFIX" = "$HACK" ; then
 	exit 1
 fi
 
-LIBDIR=$DESTDIR$PREFIX/lib
 LIB64_PLATFORM=false
 case `uname -m` in
     x86_64|ppc64|s390x)
@@ -22,11 +21,11 @@ case `uname -m` in
 	;;
 esac
 if test -d $PREFIX/lib64 && test "$LIB64_PLATFORM" = "true" ; then
-	LIBDIR=$PREFIX/lib64
+	LIBDIR=${LIBDIR:-$PREFIX/lib64}
 else
-	LIBDIR=$PREFIX/lib
+	LIBDIR=${LIBDIR:-$PREFIX/lib}
 fi
-  
+
 BASE_TMP_DIR=/tmp
   
 INSTALLWATCH_VERSION=0.7.0beta7

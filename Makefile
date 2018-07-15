@@ -31,22 +31,20 @@ install: all
 		rm -f  $(LIBDIR)/installwatch.so; \
 	fi
 	install installwatch.so $(LIBDIR)
-	
+
 	sed -e "s|#PREFIX#|$(PREFIX)|" < installwatch > $(BINDIR)/installwatch
 	chmod 755 $(BINDIR)/installwatch
 
 uninstall:
 	rm -f $(LIBDIR)/installwatch.so
 	rm -f $(BINDIR)/installwatch
-	
+
 clean:
 	rm -f *~ *.bak *.o installwatch.so core localdecls.h libctest test-installwatch
 
 tarball: clean
 	tar -czvC .. -f ../installwatch-$(VERSION).tar.gz installwatch-$(VERSION)
 
-test: install
-	gcc -Wall -DVERSION=\"$(VERSION)\" -o test-installwatch test-installwatch.c -ldl
-	$(PREFIX)/bin/installwatch ./test-installwatch
-
-
+test: installwatch.so
+	gcc -DLIBDIR=\".\" -Wall -DVERSION=\"$(VERSION)\" -o test-installwatch test-installwatch.c -ldl
+	PREFIX=. LIBDIR=. ./installwatch ./test-installwatch

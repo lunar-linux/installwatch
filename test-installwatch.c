@@ -15,6 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * July-15-2018 modifications by Stefan Wold <ratler@lunar-linux.org>
+ *   - fixed refcount in test_chmod
+ *   - added a few tests for GLIBC_MINOR >= 4
  */
 
 #include <fcntl.h>
@@ -24,6 +28,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <dlfcn.h>
+#include <stdlib.h>
 
 #include "localdecls.h"
 
@@ -250,6 +255,54 @@ void test_truncate64(void) {
 
 #endif
 
+#if(GLIBC_MINOR >= 4)
+void test_renameat(void) {
+  int fd;
+  FILE *fd_read;
+	fd = creat(TESTFILE, 0700);
+	close(fd);
+	renameat(AT_FDCWD, TESTFILE, AT_FDCWD, TESTFILE2);
+	fd_read = fopen(TESTFILE2, "r");
+  close(fd_read);
+  if (fd_read != NULL)
+    unlinkat(AT_FDCWD, TESTFILE2, 0);
+}
+
+void test_linkat(void) {
+  int fd;
+  fd = creat(TESTFILE, 0700);
+  close(fd);
+
+  if (linkat(AT_FDCWD, TESTFILE, AT_FDCWD, TESTFILE2, 0) == 0) {
+    unlink(TESTFILE);
+    unlink(TESTFILE2);
+  }
+}
+
+void test_symlinkat(void) {
+  int fd;
+  fd = creat(TESTFILE, 0700);
+  close(fd);
+
+  if(symlinkat(TESTFILE, AT_FDCWD, TESTFILE2) == 0) {
+    unlink(TESTFILE);
+    unlink(TESTFILE2);
+  }
+}
+
+void test_mkdirat(void) {
+  mkdirat(AT_FDCWD, TESTFILE, 0700);
+  rmdir(TESTFILE);
+}
+
+void test_unlinkat(void) {
+  int fd;
+  fd = creat(TESTFILE, 0700);
+  close(fd);
+  unlinkat(AT_FDCWD, TESTFILE, 0);
+}
+#endif
+
 int do_test(const char *name, void (*function)(void), int increment) {
 	int old_refcount;
 	
@@ -287,7 +340,7 @@ int main(int argc, char **argv) {
 	puts("Testing installwatch " VERSION);
 	puts("Using " TESTFILE " and " TESTFILE2 " as a test files\n");
 	passed = failed = 0;
-	do_test("chmod", test_chmod, 4);
+	do_test("chmod", test_chmod, 3);
 	do_test("chown", test_chown, 3);
 	do_test("chroot", test_chroot, 1);
 	do_test("creat", test_creat, 2);
@@ -320,6 +373,13 @@ int main(int argc, char **argv) {
 	do_test("truncate64", test_truncate64, 3);
 #endif
 	do_test("unlink", test_unlink, 2);
+#if(GLIBC_MINOR >= 4)
+  do_test("renameat", test_renameat, 4);
+  do_test("linkat", test_linkat, 4);
+  do_test("symlinkat", test_symlinkat, 4);
+  do_test("mkdirat", test_mkdirat, 2);
+  do_test("unlinkat", test_unlinkat, 2);
+#endif
 
 	putchar('\n');
 	if(failed != 0) {
