@@ -8,7 +8,7 @@ PREFIX ?= /usr/local
 
 # End of configurable part
 
-VERSION=0.7.0-lunar-1
+VERSION=0.7.0-lunar-2
 
 CFLAGS ?=
 BINDIR=$(PREFIX)/bin
@@ -30,9 +30,11 @@ install: all
 	mkdir -p $(BINDIR)
 	if [ -r $(LIBDIR)/installwatch.so ]; then \
 		rm -f  $(LIBDIR)/installwatch.so; \
+	  LD_PRELOAD="" install -Dm0755 installwatch.so $(LIBDIR)/; \
+		touch $(LIBDIR)/installwatch.so; \
+	else \
+		install -Dm0755 installwatch.so $(LIBDIR)/; \
 	fi
-	install installwatch.so $(LIBDIR)
-
 	sed -e "s|#PREFIX#|$(PREFIX)|" < installwatch > $(BINDIR)/installwatch
 	chmod 755 $(BINDIR)/installwatch
 
