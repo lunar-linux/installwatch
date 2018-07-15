@@ -117,7 +117,9 @@ static int (*true_truncate)(const char *, TRUNCATE_T);
 static int (*true_unlink)(const char *);
 static int (*true_utime)(const char *,const struct utimbuf *);
 static int (*true_utimes)(const char *,const struct timeval *);
+#ifndef NOLOG_ACCESS
 static int (*true_access)(const char *, int);
+#endif
 static int (*true_setxattr)(const char *,const char *,const void *,
                             size_t, int);
 static int (*true_removexattr)(const char *,const char *);
@@ -387,9 +389,10 @@ static void initialize(void) {
 	true_unlink      = dlsym(libc_handle, "unlink");
 	true_utime       = dlsym(libc_handle, "utime");
 	true_setxattr    = dlsym(libc_handle, "setxattr");
-        true_utimes      = dlsym(libc_handle, "utimes");
-        true_access      = dlsym(libc_handle, "access");
-
+  true_utimes      = dlsym(libc_handle, "utimes");
+#ifndef NOLOG_ACCESS
+  true_access      = dlsym(libc_handle, "access");
+#endif
 
 
 #if(GLIBC_MINOR >= 1)
@@ -3400,6 +3403,7 @@ int utimes (const char *pathname, const struct timeval *newtimes) {
        return result;
 }
 
+#ifndef NOLOG_ACCESS
 int access (const char *pathname, int type) {
        int result;
        instw_t instw;
@@ -3435,6 +3439,7 @@ int access (const char *pathname, int type) {
 
        return result;
 }
+#endif
 
 int setxattr (const char *pathname, const char *name,
               const void *value, size_t size, int flags)
