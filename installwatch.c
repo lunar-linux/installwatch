@@ -526,7 +526,7 @@ static inline int logg(const char *format,...) {
 	va_list ap;
 	int rcod; 
 	
-	logname=getenv("INSTW_LOGFILE");
+	logname=getenv("INSTALLWATCHFILE");
 	va_start(ap,format);
 	rcod=vlambda_log(logname,format,ap);
 	va_end(ap);
@@ -2465,7 +2465,7 @@ int chroot(const char *path) {
 	result = true_chroot(path);
 	  /*
 	   * From now on, another log file will be written if 
-	   * INSTW_LOGFILE is set                          
+	   * INSTALLWATCHFILE is set
 	   */
 	logg("%d\tchroot\t%s\t#%s\n", result, canonic, error(result));
 	return result;
