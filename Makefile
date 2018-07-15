@@ -4,12 +4,13 @@
 # Well, the only configurable part is the following variable.
 # Make sure the directory you specify exists.
 
-PREFIX=/usr/local
+PREFIX ?= /usr/local
 
 # End of configurable part
 
 VERSION=0.7.0beta7
 
+CFLAGS ?=
 BINDIR=$(PREFIX)/bin
 LIBDIR=$(PREFIX)/lib
 
@@ -19,7 +20,7 @@ installwatch.so: installwatch.o
 	ld -shared -o installwatch.so installwatch.o -ldl -lc
 
 installwatch.o: installwatch.c localdecls.h
-	gcc -Wall -c -D_GNU_SOURCE -DPIC -fPIC -D_REENTRANT -DVERSION=\"$(VERSION)\" installwatch.c
+	gcc $(CFLAGS) -Wall -c -D_GNU_SOURCE -DPIC -fPIC -D_REENTRANT -DVERSION=\"$(VERSION)\" installwatch.c
 
 localdecls.h: create-localdecls
 	./create-localdecls
