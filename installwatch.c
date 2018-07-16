@@ -2548,7 +2548,7 @@ int fchown(int fd, uid_t owner, gid_t group) {
 }
 
 FILE *fopen(const char *pathname, const char *mode) {
-	FILE *result;
+	FILE *result = NULL;
 	instw_t instw;
 	int status=0;
 
