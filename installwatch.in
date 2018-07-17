@@ -1,14 +1,9 @@
 #!/bin/bash
-#$Id: installwatch,v 0.6.7.0 2007/12/04 07:35:04 gna Exp $
-
 #set -x
 
-PREFIX=${PREFIX:-#PREFIX#}
+PREFIX=${PREFIX:-@PREFIX@}
 
-HACK="PREFIX"
-HACK="#$HACK#";
-
-if test "$PREFIX" = "$HACK" ; then
+if ! test -d "$PREFIX"; then
 	echo 'This script has not been installed'
 	echo 'Please run "make install"'
 	exit 1
@@ -28,7 +23,7 @@ fi
 
 BASE_TMP_DIR=/tmp
   
-INSTALLWATCH_VERSION=0.7.0beta7
+INSTALLWATCH_VERSION=@VERSION@
   
  
 #

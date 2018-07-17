@@ -30,7 +30,7 @@
 #include <dlfcn.h>
 #include <stdlib.h>
 
-#include "localdecls.h"
+#include <config.h>
 
 #ifndef	LIBDIR 
 	#define LIBDIR "/usr/local/lib"

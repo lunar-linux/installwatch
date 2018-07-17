@@ -26,7 +26,14 @@
  *
  * march-31-2007 - Modifications by Frederick Emmott
  *                                  <mail@fredemmott.co.uk>
+ *
+ * july-17-2018 - Modifications by Stefan Wold <ratler@lunar-linux.org>
+ * - a few changes to build with autotools
+ * 
  */
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE 1
+#endif
 
 #include <sys/param.h>
 #include <sys/types.h>
@@ -54,10 +61,20 @@
 #else
 #define D_OFF(X) (X)
 #endif
-	
-#include "localdecls.h"
 
-#define DEBUG 1  
+#include <config.h>
+
+#ifdef HAVE_SIZE_T_TRUNCATE
+# define TRUNCATE_T size_t
+#else
+# define TRUNCATE_T off_t
+#endif
+
+#ifdef HAVE_SSIZE_T_READLINKAT
+# define READLINKAT_T ssize_t
+#else
+# define READLINKAT_T int
+#endif
 
 #define LOGLEVEL (LOG_USER | LOG_INFO | LOG_PID)
 #define BUFSIZE 1024
@@ -117,7 +134,7 @@ static int (*true_truncate)(const char *, TRUNCATE_T);
 static int (*true_unlink)(const char *);
 static int (*true_utime)(const char *,const struct utimbuf *);
 static int (*true_utimes)(const char *,const struct timeval *);
-#ifndef NOLOG_ACCESS
+#ifdef ENABLE_ACCESS_LOG
 static int (*true_access)(const char *, int);
 #endif
 static int (*true_setxattr)(const char *,const char *,const void *,
@@ -353,7 +370,7 @@ static void initialize(void) {
 
 	#ifdef BROKEN_RTLD_NEXT
 //        	printf ("RTLD_LAZY");
-        	libc_handle = dlopen(LIBC_VERSION, RTLD_LAZY);
+        	libc_handle = dlopen(LIBC_FILE, RTLD_LAZY);
 	#else
  //       	printf ("RTLD_NEXT");
         	libc_handle = RTLD_NEXT;
@@ -390,7 +407,7 @@ static void initialize(void) {
 	true_utime       = dlsym(libc_handle, "utime");
 	true_setxattr    = dlsym(libc_handle, "setxattr");
   true_utimes      = dlsym(libc_handle, "utimes");
-#ifndef NOLOG_ACCESS
+#ifdef ENABLE_ACCESS_LOG
   true_access      = dlsym(libc_handle, "access");
 #endif
 
@@ -428,14 +445,17 @@ static void initialize(void) {
 	if(instw_init()) exit(-1);
 }
 
-void _init(void) {
-	initialize();
+int main(){}
+
+void __attribute__ ((constructor)) my_init(void) {
+  initialize();
 }
 
-void _fini(void) {
-	instw_fini();	
+void __attribute__ ((destructor)) my_fini(void) {
+  instw_fini();
 }
 
+*/
 /*
  * *****************************************************************************
  */
@@ -1033,7 +1053,7 @@ int parse_suffix(char *pnp,char *pns,const char *suffix) {
 /*
  * *****************************************************************************
  */
-
+#ifdef DEBUG
 static int __instw_printdirent(struct dirent *entry) {
 
 	if(entry!=NULL) {
@@ -1081,7 +1101,7 @@ static int __instw_printdirent64(struct dirent64 *entry) {
 
 	return 0;
 }
-
+#endif
 /*
  * *****************************************************************************
  */
@@ -1174,7 +1194,6 @@ static int instw_init(void) {
 	char *proot;
 	char *pbackup;
 	char *ptransl;
-	char *pdbglvl;
 	struct stat info;
 	char wrkpath[PATH_MAX+1];
 	char *pexclude;
@@ -1189,6 +1208,7 @@ static int instw_init(void) {
 	  /*
 	   * We set the requested dynamic debug level
 	   */
+	char *pdbglvl;
 	__instw.dbglvl=0;
 	if((pdbglvl=getenv("INSTW_DBGLVL"))) {
 		__instw.dbglvl=atoi(pdbglvl);
@@ -3403,7 +3423,7 @@ int utimes (const char *pathname, const struct timeval *newtimes) {
        return result;
 }
 
-#ifndef NOLOG_ACCESS
+#ifdef ENABLE_ACCESS_LOG
 int access (const char *pathname, int type) {
        int result;
        instw_t instw;
