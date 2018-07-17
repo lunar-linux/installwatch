@@ -44,10 +44,10 @@ AC_MSG_RESULT([$LIBC_SONAME])
 
 case "$LIBC_SONAME" in
      libc.so.5)
+       AC_DEFINE(BROKEN_RTLD_NEXT, 1, [Broken rtld])
        AC_DEFINE(LIBC_FILE, "libc.so.5", [The libc filename])
        ;;
      libc.so.6)
-       AC_DEFINE(LIBC_FILE, "libc.so.6", [The libc filename])
        dnl Determine glibc version, if not possible assume 2.1
        AC_CHECK_HEADER([features.h])
        AC_MSG_CHECKING([for glibc version])
