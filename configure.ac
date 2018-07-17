@@ -1,6 +1,6 @@
 AC_INIT([installwatch], [0.8.0rc1], [ratler@lunar-linux.org])
 LT_INIT
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([dist-xz])
 AC_ENABLE_SHARED
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL(libtool)
