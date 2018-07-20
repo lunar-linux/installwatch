@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I m4
-EXTRA_DIST =
+EXTRA_DIST = autogen.sh
 DISTCLEANFILES =
 
 lib_LTLIBRARIES = installwatch.la
