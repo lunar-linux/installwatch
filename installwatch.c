@@ -134,12 +134,14 @@ static int (*true_truncate)(const char *, TRUNCATE_T);
 static int (*true_unlink)(const char *);
 static int (*true_utime)(const char *,const struct utimbuf *);
 static int (*true_utimes)(const char *,const struct timeval *);
-#ifdef ENABLE_ACCESS_LOG
+#ifdef ENABLE_ACCESS_SYSCALL
 static int (*true_access)(const char *, int);
 #endif
+#ifdef ENABLE_ACL_SYSCALL
 static int (*true_setxattr)(const char *,const char *,const void *,
                             size_t, int);
 static int (*true_removexattr)(const char *,const char *);
+#endif
 
 #if(GLIBC_MINOR >= 1)
 
@@ -405,9 +407,11 @@ static void initialize(void) {
 	true_truncate    = dlsym(libc_handle, "truncate");
 	true_unlink      = dlsym(libc_handle, "unlink");
 	true_utime       = dlsym(libc_handle, "utime");
+#ifdef ENABLE_ACL_SYSCALL
 	true_setxattr    = dlsym(libc_handle, "setxattr");
+#endif
   true_utimes      = dlsym(libc_handle, "utimes");
-#ifdef ENABLE_ACCESS_LOG
+#ifdef ENABLE_ACCESS_SYSCALL
   true_access      = dlsym(libc_handle, "access");
 #endif
 
@@ -422,7 +426,9 @@ static void initialize(void) {
 	true_xstat64     = dlsym(libc_handle, "__xstat64");
 	true_lxstat64    = dlsym(libc_handle, "__lxstat64");
 	true_truncate64  = dlsym(libc_handle, "truncate64");
-        true_removexattr = dlsym(libc_handle, "removexattr");
+#ifdef ENABLE_ACL_SYSCALL
+	true_removexattr = dlsym(libc_handle, "removexattr");
+#endif
 #endif
 
 #if (GLIBC_MINOR >= 4)
@@ -3422,7 +3428,7 @@ int utimes (const char *pathname, const struct timeval *newtimes) {
        return result;
 }
 
-#ifdef ENABLE_ACCESS_LOG
+#ifdef ENABLE_ACCESS_SYSCALL
 int access (const char *pathname, int type) {
        int result;
        instw_t instw;
@@ -3460,6 +3466,7 @@ int access (const char *pathname, int type) {
 }
 #endif
 
+#ifdef ENABLE_ACL_SYSCALL
 int setxattr (const char *pathname, const char *name,
               const void *value, size_t size, int flags)
 {
@@ -3539,6 +3546,7 @@ int removexattr (const char *pathname, const char *name)
 
         return result;
 }
+#endif
 
 #if(GLIBC_MINOR >= 1)
 

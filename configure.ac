@@ -121,7 +121,17 @@ AC_ARG_ENABLE([access-syscall],
   [],
   [enable_access_syscall=yes])
 if test "x$enable_access_syscall" = "xyes"; then
-  AC_DEFINE(ENABLE_ACCESS_LOG, 1, [Log access syscalls])
+  AC_DEFINE(ENABLE_ACCESS_SYSCALL, 1, [Log access syscalls])
+fi
+
+dnl Enable "acl" syscalls (setxattr, removexattr) logging
+AC_ARG_ENABLE([acl-syscall],
+  [AS_HELP_STRING([--enable-acl-syscall],
+  [Log acl (setxattr, removexattr) syscalls [default=yes]])],
+  [],
+  [enable_acl_syscall=yes])
+if test "x$enable_acl_syscall" = "xyes"; then
+   AC_DEFINE(ENABLE_ACL_SYSCALL, 1, [Log acl syscalls])
 fi
 
 AC_OUTPUT
