@@ -110,7 +110,8 @@ AC_ARG_ENABLE([debug],
 [enable_debug=no])
 
 AS_IF([test "x$enable_debug" != "xno"],
-      [CFLAGS=$local_cflags" -g"
+      [DEBUG_CFLAGS="-ggdb"
+      AC_SUBST(DEBUG_CFLAGS)
       AC_DEFINE(DEBUG, 1, [Enable debugging])
       ])
 

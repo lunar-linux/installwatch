@@ -5,7 +5,7 @@ DISTCLEANFILES =
 
 lib_LTLIBRARIES = installwatch.la
 installwatch_la_SOURCES = installwatch.c
-installwatch_la_CPPFLAGS = -Wall -D_REENTRANT
+installwatch_la_CFLAGS = -Wall -D_REENTRANT $(DEBUG_CFLAGS)
 installwatch_la_LDFLAGS = -module -shared -avoid-version
 installwatch_la_LIBADD = -ldl -lc
 
