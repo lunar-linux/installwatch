@@ -411,7 +411,7 @@ static void initialize(void) {
 	true_opendir     = dlsym(handle, "opendir");
 	true_readdir     = dlsym(handle, "readdir");
 	true_readlink    = dlsym(handle, "readlink");
-	true_realpath    = dlsym(handle, "realpath");
+	true_realpath    = dlvsym(handle, "realpath", "GLIBC_2.3");
 	true_rename      = dlsym(handle, "rename");
 	true_rmdir       = dlsym(handle, "rmdir");
 	true_scandir     = dlsym(handle, "scandir");
