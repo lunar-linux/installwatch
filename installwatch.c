@@ -3013,8 +3013,10 @@ ssize_t readlink(const char *path,char *buf,size_t bufsiz) {
 	int status;
 
 	// jemalloc tries to read this before we can initialize...
-	if (!strcmp(path, "/etc/malloc.conf") && !libc_handle)
+	if (!strcmp(path, "/etc/malloc.conf") && !libc_handle){
+		errno= ENOENT;
 		return -1;
+	}
 
 	if (!libc_handle)
 		initialize();
