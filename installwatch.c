@@ -366,9 +366,21 @@ static inline int debug(int dbglvl,const char *format,...)
  */
 
 static void *libc_handle=NULL;
+static char installwatch_initializing= 0;
 static void initialize(void) {
 	if (libc_handle)
 		return;
+
+	if(installwatch_initializing){
+			fprintf(stderr,
+				"installwatch: "
+				"Something went very wrong. "
+				"installwatch accidentally caught a function call during initialize."
+				"This will not end well.");
+			return;
+	}
+
+	installwatch_initializing = 1;
 
 	void* handle = NULL;
 
@@ -451,6 +463,8 @@ static void initialize(void) {
 #endif
 
 	libc_handle = handle;
+
+	installwatch_initializing= 0;
 
 	if(instw_init()) exit(-1);
 }
