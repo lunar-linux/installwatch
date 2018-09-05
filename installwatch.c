@@ -370,83 +370,87 @@ static void initialize(void) {
 	if (libc_handle)
 		return;
 
+	void* handle = NULL;
+
 	#ifdef BROKEN_RTLD_NEXT
 //        	printf ("RTLD_LAZY");
-        	libc_handle = dlopen(LIBC_FILE, RTLD_LAZY);
+		handle = dlopen(LIBC_FILE, RTLD_LAZY);
 	#else
  //       	printf ("RTLD_NEXT");
-        	libc_handle = RTLD_NEXT;
+		handle = RTLD_NEXT;
 	#endif
 
-	true_time        = dlsym(libc_handle, "time");
-	true_chdir       = dlsym(libc_handle, "chdir");
-	true_chmod       = dlsym(libc_handle, "chmod");
-	true_chown       = dlsym(libc_handle, "chown");
-	true_chroot      = dlsym(libc_handle, "chroot");
-	true_creat       = dlsym(libc_handle, "creat");
-	true_fchmod      = dlsym(libc_handle, "fchmod");
-	true_fchown      = dlsym(libc_handle, "fchown");
-	true_fopen       = dlsym(libc_handle, "fopen");
-	true_ftruncate   = dlsym(libc_handle, "ftruncate");
-	true_getcwd      = dlsym(libc_handle, "getcwd");
-	true_lchown      = dlsym(libc_handle, "lchown");
-	true_link        = dlsym(libc_handle, "link");
-	true_mkdir       = dlsym(libc_handle, "mkdir");
-	true_xmknod      = dlsym(libc_handle, "__xmknod");
-	true_open        = dlsym(libc_handle, "open");
-	true_opendir     = dlsym(libc_handle, "opendir");
-	true_readdir     = dlsym(libc_handle, "readdir");
-	true_readlink    = dlsym(libc_handle, "readlink");
-	true_realpath    = dlsym(libc_handle, "realpath");
-	true_rename      = dlsym(libc_handle, "rename");
-	true_rmdir       = dlsym(libc_handle, "rmdir");
-	true_scandir     = dlsym(libc_handle, "scandir");
-	true_xstat       = dlsym(libc_handle, "__xstat");
-	true_lxstat      = dlsym(libc_handle, "__lxstat");
-	true_symlink     = dlsym(libc_handle, "symlink");
-	true_truncate    = dlsym(libc_handle, "truncate");
-	true_unlink      = dlsym(libc_handle, "unlink");
-	true_utime       = dlsym(libc_handle, "utime");
+	true_time        = dlsym(handle, "time");
+	true_chdir       = dlsym(handle, "chdir");
+	true_chmod       = dlsym(handle, "chmod");
+	true_chown       = dlsym(handle, "chown");
+	true_chroot      = dlsym(handle, "chroot");
+	true_creat       = dlsym(handle, "creat");
+	true_fchmod      = dlsym(handle, "fchmod");
+	true_fchown      = dlsym(handle, "fchown");
+	true_fopen       = dlsym(handle, "fopen");
+	true_ftruncate   = dlsym(handle, "ftruncate");
+	true_getcwd      = dlsym(handle, "getcwd");
+	true_lchown      = dlsym(handle, "lchown");
+	true_link        = dlsym(handle, "link");
+	true_mkdir       = dlsym(handle, "mkdir");
+	true_xmknod      = dlsym(handle, "__xmknod");
+	true_open        = dlsym(handle, "open");
+	true_opendir     = dlsym(handle, "opendir");
+	true_readdir     = dlsym(handle, "readdir");
+	true_readlink    = dlsym(handle, "readlink");
+	true_realpath    = dlsym(handle, "realpath");
+	true_rename      = dlsym(handle, "rename");
+	true_rmdir       = dlsym(handle, "rmdir");
+	true_scandir     = dlsym(handle, "scandir");
+	true_xstat       = dlsym(handle, "__xstat");
+	true_lxstat      = dlsym(handle, "__lxstat");
+	true_symlink     = dlsym(handle, "symlink");
+	true_truncate    = dlsym(handle, "truncate");
+	true_unlink      = dlsym(handle, "unlink");
+	true_utime       = dlsym(handle, "utime");
 #ifdef ENABLE_ACL_SYSCALL
-	true_setxattr    = dlsym(libc_handle, "setxattr");
+	true_setxattr    = dlsym(handle, "setxattr");
 #endif
-  true_utimes      = dlsym(libc_handle, "utimes");
+	true_utimes      = dlsym(handle, "utimes");
 #ifdef ENABLE_ACCESS_SYSCALL
-  true_access      = dlsym(libc_handle, "access");
+	true_access      = dlsym(handle, "access");
 #endif
 
 
 #if(GLIBC_MINOR >= 1)
-	true_creat64     = dlsym(libc_handle, "creat64");
-	true_fopen64     = dlsym(libc_handle, "fopen64");
-	true_ftruncate64 = dlsym(libc_handle, "ftruncate64");
-	true_open64      = dlsym(libc_handle, "open64");
-	true_readdir64   = dlsym(libc_handle, "readdir64");
-	true_scandir64   = dlsym(libc_handle, "scandir64");
-	true_xstat64     = dlsym(libc_handle, "__xstat64");
-	true_lxstat64    = dlsym(libc_handle, "__lxstat64");
-	true_truncate64  = dlsym(libc_handle, "truncate64");
+	true_creat64     = dlsym(handle, "creat64");
+	true_fopen64     = dlsym(handle, "fopen64");
+	true_ftruncate64 = dlsym(handle, "ftruncate64");
+	true_open64      = dlsym(handle, "open64");
+	true_readdir64   = dlsym(handle, "readdir64");
+	true_scandir64   = dlsym(handle, "scandir64");
+	true_xstat64     = dlsym(handle, "__xstat64");
+	true_lxstat64    = dlsym(handle, "__lxstat64");
+	true_truncate64  = dlsym(handle, "truncate64");
 #ifdef ENABLE_ACL_SYSCALL
-	true_removexattr = dlsym(libc_handle, "removexattr");
+	true_removexattr = dlsym(handle, "removexattr");
 #endif
 #endif
 
 #if (GLIBC_MINOR >= 4)
 
-	true_openat      = dlsym(libc_handle, "openat");
-	true_fchmodat      = dlsym(libc_handle, "fchmodat");
-	true_fchownat      = dlsym(libc_handle, "fchownat");
-	true_fxstatat      = dlsym(libc_handle, "__fxstatat");
-	true_fxstatat64      = dlsym(libc_handle, "__fxstatat64");
-	true_linkat      = dlsym(libc_handle, "linkat");
-	true_mkdirat      = dlsym(libc_handle, "mkdirat");
-	true_readlinkat      = dlsym(libc_handle, "readlinkat");
-	true_xmknodat      = dlsym(libc_handle, "__xmknodat");
-	true_renameat      = dlsym(libc_handle, "renameat");
-	true_symlinkat     = dlsym(libc_handle, "symlinkat");
-	true_unlinkat      = dlsym(libc_handle, "unlinkat");
+	true_openat      = dlsym(handle, "openat");
+	true_fchmodat    = dlsym(handle, "fchmodat");
+	true_fchownat    = dlsym(handle, "fchownat");
+	true_fxstatat    = dlsym(handle, "__fxstatat");
+	true_fxstatat64  = dlsym(handle, "__fxstatat64");
+	true_linkat      = dlsym(handle, "linkat");
+	true_mkdirat     = dlsym(handle, "mkdirat");
+	true_readlinkat  = dlsym(handle, "readlinkat");
+	true_xmknodat    = dlsym(handle, "__xmknodat");
+	true_renameat    = dlsym(handle, "renameat");
+	true_symlinkat   = dlsym(handle, "symlinkat");
+	true_unlinkat    = dlsym(handle, "unlinkat");
 
 #endif
+
+	libc_handle = handle;
 
 	if(instw_init()) exit(-1);
 }
@@ -2993,6 +2997,10 @@ ssize_t readlink(const char *path,char *buf,size_t bufsiz) {
 #endif
 	instw_t instw;
 	int status;
+
+	// jemalloc tries to read this before we can initialize...
+	if (!strcmp(path, "/etc/malloc.conf") && !libc_handle)
+		return -1;
 
 	if (!libc_handle)
 		initialize();
