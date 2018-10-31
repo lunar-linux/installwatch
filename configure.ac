@@ -19,6 +19,7 @@ AC_PROG_INSTALL
 AC_CHECK_TOOL(LDD, ldd)
 AC_CHECK_TOOL(CHMOD, chmod)
 AC_CHECK_HEADERS([sys/param.h \
+                  sys/stat.h \
                   fcntl.h \
                   stdarg.h \
                   stdio.h \
@@ -31,6 +32,7 @@ AC_CHECK_HEADERS([sys/param.h \
                   utime.h \
                   dirent.h \
                   linux/version.h])
+AC_CHECK_FUNCS(utimensat)
 
 local_cflags="$CFLAGS"
 

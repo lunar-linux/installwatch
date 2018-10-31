@@ -173,6 +173,10 @@ static int (*true_symlinkat)(const char *, int, const char *);
 static int (*true_unlinkat)(int, const char *, int);
 #endif
 
+#ifdef HAVE_UTIMENSAT
+static int (*true_utimensat)(int, const char *, const struct timespec[2], int);
+#endif
+
 #if defined __GNUC__ && __GNUC__>=2
 	#define inline inline
 #else
@@ -413,6 +417,9 @@ static void initialize(void) {
 	true_truncate    = dlsym(handle, "truncate");
 	true_unlink      = dlsym(handle, "unlink");
 	true_utime       = dlsym(handle, "utime");
+#ifdef HAVE_UTIMENSAT
+  true_utimensat   = dlsym(handle, "utimensat");
+#endif
 #ifdef ENABLE_ACL_SYSCALL
 	true_setxattr    = dlsym(handle, "setxattr");
 #endif
@@ -3407,6 +3414,44 @@ int utime (const char *pathname, const struct utimbuf *newtimes) {
 
 	return result;
 }
+
+#ifdef HAVE_UTIMENSAT
+int utimensat (int dirfd, const char *pathname, const struct timespec times[2], int flags) {
+  int result;
+  instw_t instw;
+
+  if (!libc_handle)
+    initialize();
+
+#if DEBUG
+  debug(2, "utimensat(%d, %s, timespec, %d)", dirfd, pathname, flags);
+#endif
+
+  /* We were asked to work in "real" mode */
+	if( !(__instw.gstatus & INSTW_INITIALIZED) ||
+	    !(__instw.gstatus & INSTW_OKWRAP) ) {
+		result=true_utimensat(dirfd, pathname, times, flags);
+		return result;
+	}
+
+  instw_new(&instw);
+  instw_setpath(&instw, pathname);
+
+#if DEBUG
+  instw_print(&instw);
+#endif
+
+  backup(instw.truepath);
+  instw_apply(&instw);
+
+  result=true_utimensat(dirfd, instw.translpath, times, flags);
+  logg("%d\tutimensat\t%s\t#%s\n", result, instw.reslvpath, error(result));
+
+  instw_delete(&instw);
+
+  return result;
+}
+#endif
 
 int utimes (const char *pathname, const struct timeval *newtimes) {
        int result;

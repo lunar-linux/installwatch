@@ -29,6 +29,7 @@
 #include <time.h>
 #include <dlfcn.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <config.h>
 
@@ -303,6 +304,19 @@ void test_unlinkat(void) {
 }
 #endif
 
+#ifdef HAVE_UTIMENSAT
+void test_utimensat(void) {
+  int fd;
+  clockid_t clk_id = CLOCK_REALTIME;
+  struct timespec *ts;
+  fd = creat(TESTFILE, 0700);
+  close(fd);
+  clock_gettime(clk_id, &ts);
+  utimensat(0, TESTFILE, ts, AT_SYMLINK_NOFOLLOW);
+  unlink(TESTFILE);
+}
+#endif
+
 int do_test(const char *name, void (*function)(void), int increment) {
 	int old_refcount;
 	
@@ -379,6 +393,9 @@ int main(int argc, char **argv) {
   do_test("symlinkat", test_symlinkat, 4);
   do_test("mkdirat", test_mkdirat, 2);
   do_test("unlinkat", test_unlinkat, 2);
+#endif
+#ifdef HAVE_UTIMENSAT
+  do_test("utimensat", test_utimensat, 2);
 #endif
 
 	putchar('\n');
