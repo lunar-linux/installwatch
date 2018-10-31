@@ -115,20 +115,6 @@ static int (*true_rename)(const char *, const char *);
 static int (*true_rmdir)(const char *);
 static int (*true_xstat)(int,const char *,struct stat *);
 static int (*true_lxstat)(int,const char *,struct stat *);
-
-#if(GLIBC_MINOR >= 10)
-
-static int (*true_scandir)(	const char *,struct dirent ***,
-				int (*)(const struct dirent *),
-				int (*)(const struct dirent **,const struct dirent **));
-
-#else
-
-static int (*true_scandir)(	const char *,struct dirent ***,
-				int (*)(const struct dirent *),
-				int (*)(const void *,const void *));
-#endif
-
 static int (*true_symlink)(const char *, const char *);
 static int (*true_truncate)(const char *, TRUNCATE_T);
 static int (*true_unlink)(const char *);
@@ -152,10 +138,16 @@ static int (*true_open64)(const char *, int, ...);
 static struct dirent64 *(*true_readdir64)(DIR *dir);
 
 #if(GLIBC_MINOR >= 10)
+static int (*true_scandir)(	const char *,struct dirent ***,
+                            int (*)(const struct dirent *),
+                            int (*)(const struct dirent **,const struct dirent **));
 static int (*true_scandir64)(	const char *,struct dirent64 ***,
 				int (*)(const struct dirent64 *),
 				int (*)(const struct dirent64 **,const struct dirent64 **));
 #else
+static int (*true_scandir)(	const char *,struct dirent ***,
+                            int (*)(const struct dirent *),
+                            int (*)(const void *,const void *));
 static int (*true_scandir64)(	const char *,struct dirent64 ***,
 				int (*)(const struct dirent64 *),
 				int (*)(const void *,const void *));
