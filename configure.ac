@@ -32,7 +32,7 @@ AC_CHECK_HEADERS([sys/param.h \
                   utime.h \
                   dirent.h \
                   linux/version.h])
-AC_CHECK_FUNCS(utimensat)
+AC_CHECK_FUNCS_ONCE([utimensat renameat renameat2])
 
 local_cflags="$CFLAGS"
 

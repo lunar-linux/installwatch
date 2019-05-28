@@ -155,7 +155,6 @@ static int (*true_scandir64)(	const char *,struct dirent64 ***,
 static int (*true_xstat64)(int,const char *, struct stat64 *);
 static int (*true_lxstat64)(int,const char *, struct stat64 *);
 static int (*true_truncate64)(const char *, __off64_t);
-
 #endif
 
 #if (GLIBC_MINOR >= 4)
@@ -171,6 +170,10 @@ static int (*true_xmknodat)(int, int, const char *, mode_t, dev_t *);
 static int (*true_renameat)(int, const char *, int, const char *);
 static int (*true_symlinkat)(const char *, int, const char *);
 static int (*true_unlinkat)(int, const char *, int);
+#endif
+
+#ifdef HAVE_RENAMEAT2
+static int (*true_renameat2)(int, const char *, int, const char *, unsigned int);
 #endif
 
 #ifdef HAVE_UTIMENSAT
@@ -428,6 +431,9 @@ static void initialize(void) {
 	true_access      = dlsym(handle, "access");
 #endif
 
+#ifdef HAVE_RENAMEAT2
+	true_renameat2   = dlsym(handle, "renameat2");
+#endif
 
 #if(GLIBC_MINOR >= 1)
 	true_creat64     = dlsym(handle, "creat64");
@@ -4627,3 +4633,56 @@ int unlinkat (int dirfd, const char *path, int flags) {
 
 
 #endif /* GLIBC_MINOR >= 4 */
+
+#ifdef HAVE_RENAMEAT2
+int renameat2 (int olddirfd, const char *oldpath,
+	       int newdirfd, const char *newpath, unsigned int flags) {
+
+ 	int result;
+ 	instw_t instwold;
+ 	instw_t instwnew;
+
+ 	/* If all we are doing is normal open, forgo refcounting, etc. */
+	if( (olddirfd == AT_FDCWD || *oldpath == '/') &&
+	    (newdirfd == AT_FDCWD || *newpath == '/') ) {
+#if DEBUG
+	debug(2, "renameat2(%d, %s, %d, %s, %d)\n", olddirfd, oldpath, newdirfd, newpath, flags);
+#endif
+
+		return rename(oldpath, newpath);
+	}
+
+ 	REFCOUNT;
+
+ 	if (!libc_handle)
+ 		initialize();
+
+#if DEBUG
+	debug(2, "renameat2(%d, %s, %d, %s, %d)\n", olddirfd, oldpath, newdirfd, newpath, flags);
+#endif
+
+ 	/* We were asked to work in "real" mode */
+ 	if(!(__instw.gstatus & INSTW_INITIALIZED) ||
+ 	   !(__instw.gstatus & INSTW_OKWRAP))
+ 		return true_renameat2(olddirfd, oldpath, newdirfd, newpath, flags);
+
+ 	instw_new(&instwold);
+ 	instw_new(&instwnew);
+ 	instw_setpathrel(&instwold, olddirfd, oldpath);
+ 	instw_setpathrel(&instwnew, newdirfd, newpath);
+
+#if DEBUG
+ 	instw_print(&instwold);
+ 	instw_print(&instwnew);
+#endif
+
+ 	result=rename(instwold.path, instwnew.path);
+
+ 	instw_delete(&instwold);
+ 	instw_delete(&instwnew);
+
+	return result;
+}
+
+
+#endif

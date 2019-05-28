@@ -317,6 +317,20 @@ void test_utimensat(void) {
 }
 #endif
 
+#ifdef HAVE_RENAMEAT2
+void test_renameat2(void) {
+	int fd;
+	FILE *fd_read;
+	fd = creat(TESTFILE, 0700);
+	close(fd);
+	renameat2(AT_FDCWD, TESTFILE, AT_FDCWD, TESTFILE2, 0);
+	fd_read = fopen(TESTFILE2, "r");
+	close(fd_read);
+	if (fd_read != NULL)
+		unlinkat(AT_FDCWD, TESTFILE2, 0);
+}
+#endif
+
 int do_test(const char *name, void (*function)(void), int increment) {
 	int old_refcount;
 	
@@ -395,7 +409,10 @@ int main(int argc, char **argv) {
   do_test("unlinkat", test_unlinkat, 2);
 #endif
 #ifdef HAVE_UTIMENSAT
-  do_test("utimensat", test_utimensat, 2);
+	do_test("utimensat", test_utimensat, 2);
+#endif
+#ifdef HAVE_RENAMEAT2
+	do_test("renameat2", test_renameat2, 4);
 #endif
 
 	putchar('\n');
