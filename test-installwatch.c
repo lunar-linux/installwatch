@@ -230,8 +230,11 @@ void test_fopen64(void) {
 
 void test_ftruncate64(void) {
 	int fd;
-
-	fd = creat64(TESTFILE, 0600);
+	FILE *fh;
+	fh = fopen(TESTFILE, "w");
+	fprintf(fh, "foobar");
+	close(fh);
+	fd = open(TESTFILE, O_RDWR);
 	ftruncate64(fd, 0);
 	close(fd);
 	unlink(TESTFILE);
@@ -246,10 +249,10 @@ void test_open64(void) {
 }
 
 void test_truncate64(void) {
-	int fd;
-
-	fd = creat64(TESTFILE, 0700);
-	close(fd);
+	FILE *fh;
+	fh = fopen(TESTFILE, "w");
+	fprintf(fh, "foobar");
+	close(fh);
 	truncate64(TESTFILE, 0);
 	unlink(TESTFILE);
 }
@@ -307,12 +310,12 @@ void test_unlinkat(void) {
 #ifdef HAVE_UTIMENSAT
 void test_utimensat(void) {
   int fd;
+  struct timespec ts[2];
   clockid_t clk_id = CLOCK_REALTIME;
-  struct timespec *ts;
   fd = creat(TESTFILE, 0700);
   close(fd);
-  clock_gettime(clk_id, &ts);
-  utimensat(0, TESTFILE, ts, AT_SYMLINK_NOFOLLOW);
+  clock_gettime(clk_id, ts);
+  utimensat(AT_FDCWD, TESTFILE, ts, AT_SYMLINK_NOFOLLOW);
   unlink(TESTFILE);
 }
 #endif
@@ -383,7 +386,7 @@ int main(int argc, char **argv) {
 #endif	
 	do_test("ftruncate", test_ftruncate, 3);
 #if(GLIBC_MINOR >= 1)
-	do_test("ftruncate64", test_ftruncate64, 3);
+	do_test("ftruncate64", test_ftruncate64, 4);
 #endif
 	do_test("lchown", test_lchown, 3);
 	do_test("link", test_link, 4);
