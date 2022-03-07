@@ -184,7 +184,27 @@ static int (*true_utimensat)(int, const char *, const struct timespec[2], int);
 	#define inline inline
 #else
 	#define inline
-#endif	
+#endif
+
+#ifndef _STAT_VER
+#if defined(__aarch64__)
+# define _STAT_VER 0
+#elif defined(__x86_64__)
+# define _STAT_VER 1
+#else
+# define _STAT_VER 3
+#endif
+#endif
+
+#ifndef _MKNOD_VER
+#if defined(__aarch64__)
+# define _MKNOD_VER 0
+#elif defined(__x86_64__)
+# define _MKNOD_VER 0
+#else
+# define _MKNOD_VER 1
+#endif
+#endif
 
 static inline int true_stat(const char *pathname,struct stat *info) {
 	return true_xstat(_STAT_VER,pathname,info);
