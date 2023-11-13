@@ -1,4 +1,4 @@
-AC_INIT([installwatch], [0.9.0], [ratler@lunar-linux.org])
+AC_INIT([installwatch], [0.9.1], [ratler@lunar-linux.org])
 LT_INIT
 AM_INIT_AUTOMAKE([dist-xz])
 AC_ENABLE_SHARED
