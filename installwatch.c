@@ -3463,7 +3463,7 @@ int utimensat (int dirfd, const char *pathname, const struct timespec times[2], 
 	}
 
   instw_new(&instw);
-  instw_setpath(&instw, pathname);
+  instw_setpathrel(&instw, dirfd, pathname);
 
 #if DEBUG
   instw_print(&instw);
