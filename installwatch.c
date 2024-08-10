@@ -62,7 +62,7 @@
 #define D_OFF(X) (X)
 #endif
 
-#include <config.h>
+#include "config.h"
 
 #ifdef HAVE_SIZE_T_TRUNCATE
 # define TRUNCATE_T size_t

@@ -21,20 +21,20 @@
  *   - added a few tests for GLIBC_MINOR >= 4
  */
 
+#include "test-installwatch.h"
+#include <dlfcn.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <time.h>
-#include <dlfcn.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <time.h>
+#include <unistd.h>
 
-#include <config.h>
+#include "config.h"
 
-#ifndef	LIBDIR 
-	#define LIBDIR "/usr/local/lib"
+#ifndef LIBDIR
+#define LIBDIR "/usr/local/lib"
 #endif
 
 #define TESTFILE "/tmp/installwatch-test"
@@ -43,231 +43,229 @@
 int *refcount;
 int *timecount;
 int passed, failed;
-void* libc_handle=NULL;
+void *libc_handle = NULL;
 
 void check_installwatch(void) {
-	char *error;
+  char *error;
 
-	time(NULL);
+  time(NULL);
 
-	libc_handle=dlopen(LIBDIR"/installwatch.so",RTLD_LAZY);
-	if(!libc_handle) {
-		puts("Unable to open "LIBDIR"/installwatch.so");
-		exit(255);
-	}
+  libc_handle = dlopen(LIBDIR "/installwatch.so", RTLD_LAZY);
+  if (!libc_handle) {
+    puts("Unable to open " LIBDIR "/installwatch.so");
+    exit(255);
+  }
 
-	time(NULL);
+  time(NULL);
 
-	timecount=(int*)dlsym(libc_handle,"__installwatch_timecount");	
-	if ((error = dlerror()) != NULL)  {
-		fputs(error, stderr);
-		exit(255);
-	}
+  timecount = (int *)dlsym(libc_handle, "__installwatch_timecount");
+  if ((error = dlerror()) != NULL) {
+    fputs(error, stderr);
+    exit(255);
+  }
 
-	if((*timecount)<2) {
-		puts("This program must be run with installwatch");
-		dlclose(libc_handle);
-		exit(255);
-	}
+  if ((*timecount) < 2) {
+    puts("This program must be run with installwatch");
+    dlclose(libc_handle);
+    exit(255);
+  }
 
-	refcount=(int*)dlsym(libc_handle,"__installwatch_refcount");	
-	if ((error = dlerror()) != NULL)  {
-		fputs(error, stderr);
-		exit(255);
-	}
+  refcount = (int *)dlsym(libc_handle, "__installwatch_refcount");
+  if ((error = dlerror()) != NULL) {
+    fputs(error, stderr);
+    exit(255);
+  }
 }
 
 void test_chmod(void) {
-	int fd;
+  int fd;
 
-	fd = creat(TESTFILE, 0600);
-	close(fd);
-	chmod(TESTFILE, 0600);
-	unlink(TESTFILE);
+  fd = creat(TESTFILE, 0600);
+  close(fd);
+  chmod(TESTFILE, 0600);
+  unlink(TESTFILE);
 }
 
 void test_chown(void) {
-	int fd;
+  int fd;
 
-	fd = creat(TESTFILE, 0600);
-	close(fd);
-	chown(TESTFILE, geteuid(), getegid());
-	unlink(TESTFILE);
+  fd = creat(TESTFILE, 0600);
+  close(fd);
+  chown(TESTFILE, geteuid(), getegid());
+  unlink(TESTFILE);
 }
 
-void test_chroot(void) {
-	chroot("/");
-}
+void test_chroot(void) { chroot("/"); }
 
 void test_creat(void) {
-	int fd;
+  int fd;
 
-	fd = creat(TESTFILE, 0600);
-	close(fd);
-	unlink(TESTFILE);
+  fd = creat(TESTFILE, 0600);
+  close(fd);
+  unlink(TESTFILE);
 }
 
 void test_fchmod(void) {
-	int fd;
+  int fd;
 
-	fd = creat(TESTFILE, 0600);
-	fchmod(fd, 0600);
-	close(fd);
-	unlink(TESTFILE);
+  fd = creat(TESTFILE, 0600);
+  fchmod(fd, 0600);
+  close(fd);
+  unlink(TESTFILE);
 }
 
 void test_fchown(void) {
-	int fd;
+  int fd;
 
-	fd = creat(TESTFILE, 0600);
-	fchown(fd, geteuid(), getegid());
-	close(fd);
-	unlink(TESTFILE);
+  fd = creat(TESTFILE, 0600);
+  fchown(fd, geteuid(), getegid());
+  close(fd);
+  unlink(TESTFILE);
 }
 
 void test_fopen(void) {
-        FILE *fd;
+  FILE *fd;
 
-        fd = fopen(TESTFILE,"w");
-        fclose(fd);
-        unlink(TESTFILE);
+  fd = fopen(TESTFILE, "w");
+  fclose(fd);
+  unlink(TESTFILE);
 }
 
 void test_ftruncate(void) {
-	int fd;
+  int fd;
 
-	fd = creat(TESTFILE, 0600);
-	ftruncate(fd, 0);
-	close(fd);
-	unlink(TESTFILE);
+  fd = creat(TESTFILE, 0600);
+  ftruncate(fd, 0);
+  close(fd);
+  unlink(TESTFILE);
 }
 
 void test_lchown(void) {
-	int fd;
+  int fd;
 
-	fd = creat(TESTFILE, 0600);
-	close(fd);
-	lchown(TESTFILE, geteuid(), getegid());
-	unlink(TESTFILE);
+  fd = creat(TESTFILE, 0600);
+  close(fd);
+  lchown(TESTFILE, geteuid(), getegid());
+  unlink(TESTFILE);
 }
 
 void test_link(void) {
-	int fd;
+  int fd;
 
-	fd = creat(TESTFILE, 0600);
-	close(fd);
-	link(TESTFILE, TESTFILE2);
-	unlink(TESTFILE);
-	unlink(TESTFILE2);
+  fd = creat(TESTFILE, 0600);
+  close(fd);
+  link(TESTFILE, TESTFILE2);
+  unlink(TESTFILE);
+  unlink(TESTFILE2);
 }
 
 void test_mkdir(void) {
-	mkdir(TESTFILE, 0700);
-	rmdir(TESTFILE);
+  mkdir(TESTFILE, 0700);
+  rmdir(TESTFILE);
 }
 
 void test_open(void) {
-	int fd;
+  int fd;
 
-	fd = open(TESTFILE, O_CREAT, O_RDWR, 0700);
-	close(fd);
-	unlink(TESTFILE);
+  fd = open(TESTFILE, O_CREAT, O_RDWR, 0700);
+  close(fd);
+  unlink(TESTFILE);
 }
 
 void test_rename(void) {
-	int fd;
+  int fd;
 
-	fd = creat(TESTFILE, 0700);
-	close(fd);
-	rename(TESTFILE, TESTFILE2);
-	unlink(TESTFILE2);
+  fd = creat(TESTFILE, 0700);
+  close(fd);
+  rename(TESTFILE, TESTFILE2);
+  unlink(TESTFILE2);
 }
 
 void test_symlink(void) {
-	int fd;
+  int fd;
 
-	fd = creat(TESTFILE, 0700);
-	close(fd);
-	symlink(TESTFILE, TESTFILE2);
-	unlink(TESTFILE);
-	unlink(TESTFILE2);
+  fd = creat(TESTFILE, 0700);
+  close(fd);
+  symlink(TESTFILE, TESTFILE2);
+  unlink(TESTFILE);
+  unlink(TESTFILE2);
 }
 
 void test_truncate(void) {
-	int fd;
+  int fd;
 
-	fd = creat(TESTFILE, 0700);
-	close(fd);
-	truncate(TESTFILE, 0);
-	unlink(TESTFILE);
+  fd = creat(TESTFILE, 0700);
+  close(fd);
+  truncate(TESTFILE, 0);
+  unlink(TESTFILE);
 }
 
 void test_unlink(void) {
-	int fd;
+  int fd;
 
-	fd = creat(TESTFILE, 0700);
-	close(fd);
-	unlink(TESTFILE);
+  fd = creat(TESTFILE, 0700);
+  close(fd);
+  unlink(TESTFILE);
 }
 
-#if(GLIBC_MINOR >= 1)
+#if (GLIBC_MINOR >= 1)
 
 void test_creat64(void) {
-	int fd;
+  int fd;
 
-	fd = creat64(TESTFILE, 0600);
-	close(fd);
-	unlink(TESTFILE);
+  fd = creat64(TESTFILE, 0600);
+  close(fd);
+  unlink(TESTFILE);
 }
 
 void test_fopen64(void) {
-        FILE *fd;
+  FILE *fd;
 
-        fd = fopen64(TESTFILE,"w");
-        fclose(fd);
-        unlink(TESTFILE);
+  fd = fopen64(TESTFILE, "w");
+  fclose(fd);
+  unlink(TESTFILE);
 }
 
 void test_ftruncate64(void) {
-	int fd;
-	FILE *fh;
-	fh = fopen(TESTFILE, "w");
-	fprintf(fh, "foobar");
-	close(fh);
-	fd = open(TESTFILE, O_RDWR);
-	ftruncate64(fd, 0);
-	close(fd);
-	unlink(TESTFILE);
+  int fd;
+  FILE *fh;
+  fh = fopen(TESTFILE, "w");
+  fprintf(fh, "foobar");
+  fclose(fh);
+  fd = open(TESTFILE, O_RDWR);
+  ftruncate64(fd, 0);
+  close(fd);
+  unlink(TESTFILE);
 }
 
 void test_open64(void) {
-	int fd;
+  int fd;
 
-	fd = open64(TESTFILE, O_CREAT, O_RDWR, 0700);
-	close(fd);
-	unlink(TESTFILE);
+  fd = open64(TESTFILE, O_CREAT, O_RDWR, 0700);
+  close(fd);
+  unlink(TESTFILE);
 }
 
 void test_truncate64(void) {
-	FILE *fh;
-	fh = fopen(TESTFILE, "w");
-	fprintf(fh, "foobar");
-	close(fh);
-	truncate64(TESTFILE, 0);
-	unlink(TESTFILE);
+  FILE *fh;
+  fh = fopen(TESTFILE, "w");
+  fprintf(fh, "foobar");
+  fclose(fh);
+  truncate64(TESTFILE, 0);
+  unlink(TESTFILE);
 }
 
 #endif
 
-#if(GLIBC_MINOR >= 4)
+#if (GLIBC_MINOR >= 4)
 void test_renameat(void) {
   int fd;
   FILE *fd_read;
-	fd = creat(TESTFILE, 0700);
-	close(fd);
-	renameat(AT_FDCWD, TESTFILE, AT_FDCWD, TESTFILE2);
-	fd_read = fopen(TESTFILE2, "r");
-  close(fd_read);
+  fd = creat(TESTFILE, 0700);
+  close(fd);
+  renameat(AT_FDCWD, TESTFILE, AT_FDCWD, TESTFILE2);
+  fd_read = fopen(TESTFILE2, "r");
+  fclose(fd_read);
   if (fd_read != NULL)
     unlinkat(AT_FDCWD, TESTFILE2, 0);
 }
@@ -288,7 +286,7 @@ void test_symlinkat(void) {
   fd = creat(TESTFILE, 0700);
   close(fd);
 
-  if(symlinkat(TESTFILE, AT_FDCWD, TESTFILE2) == 0) {
+  if (symlinkat(TESTFILE, AT_FDCWD, TESTFILE2) == 0) {
     unlink(TESTFILE);
     unlink(TESTFILE2);
   }
@@ -322,89 +320,91 @@ void test_utimensat(void) {
 
 #ifdef HAVE_RENAMEAT2
 void test_renameat2(void) {
-	int fd;
-	FILE *fd_read;
-	fd = creat(TESTFILE, 0700);
-	close(fd);
-	renameat2(AT_FDCWD, TESTFILE, AT_FDCWD, TESTFILE2, 0);
-	fd_read = fopen(TESTFILE2, "r");
-	close(fd_read);
-	if (fd_read != NULL)
-		unlinkat(AT_FDCWD, TESTFILE2, 0);
+  int fd;
+  FILE *fd_read;
+  fd = creat(TESTFILE, 0700);
+  close(fd);
+  renameat2(AT_FDCWD, TESTFILE, AT_FDCWD, TESTFILE2, 0);
+  fd_read = fopen(TESTFILE2, "r");
+  fclose(fd_read);
+  if (fd_read != NULL)
+    unlinkat(AT_FDCWD, TESTFILE2, 0);
 }
 #endif
 
 int do_test(const char *name, void (*function)(void), int increment) {
-	int old_refcount;
-	
-	printf("Testing %s... ", name);
-	old_refcount = *refcount;
-	function();
-	if(*refcount == old_refcount + increment) {
-		printf("wanted refcount=%d returned refcount=%d",
-			(old_refcount+increment),*refcount);
-		puts("passed");
-		passed++;
-		return 0;
-	} else {
-		printf("wanted refcount=%d returned refcount=%d",
-			(old_refcount+increment),*refcount);
-	        puts("failed");
-		failed++;
-		return 1;
-	}
+  int old_refcount;
+
+  printf("Testing %s... ", name);
+  old_refcount = *refcount;
+  function();
+  if (*refcount == old_refcount + increment) {
+    printf("wanted refcount=%d returned refcount=%d",
+           (old_refcount + increment), *refcount);
+    puts("passed");
+    passed++;
+    return 0;
+  } else {
+    printf("wanted refcount=%d returned refcount=%d",
+           (old_refcount + increment), *refcount);
+    puts("failed");
+    failed++;
+    return 1;
+  }
 }
 
 int main(int argc, char **argv) {
-	struct stat statbuf;
+  struct stat statbuf;
 
-	check_installwatch();
+  check_installwatch();
 
-	if(stat(TESTFILE, &statbuf) != -1) {
-		printf(TESTFILE " already exists. Please remove it and run %s again\n", argv[0]);
-		exit(254);
-	}
-	if(stat(TESTFILE2, &statbuf) != -1) {
-		printf(TESTFILE2 " already exists. Please remove it and run %s again\n", argv[0]);
-		exit(254);
-	}
-	puts("Testing installwatch " VERSION);
-	puts("Using " TESTFILE " and " TESTFILE2 " as a test files\n");
-	passed = failed = 0;
-	do_test("chmod", test_chmod, 3);
-	do_test("chown", test_chown, 3);
-	do_test("chroot", test_chroot, 1);
-	do_test("creat", test_creat, 2);
-#if(GLIBC_MINOR >= 1)
-	do_test("creat64", test_creat64, 2);
+  if (stat(TESTFILE, &statbuf) != -1) {
+    printf(TESTFILE " already exists. Please remove it and run %s again\n",
+           argv[0]);
+    exit(254);
+  }
+  if (stat(TESTFILE2, &statbuf) != -1) {
+    printf(TESTFILE2 " already exists. Please remove it and run %s again\n",
+           argv[0]);
+    exit(254);
+  }
+  puts("Testing installwatch " VERSION);
+  puts("Using " TESTFILE " and " TESTFILE2 " as a test files\n");
+  passed = failed = 0;
+  do_test("chmod", test_chmod, 3);
+  do_test("chown", test_chown, 3);
+  do_test("chroot", test_chroot, 1);
+  do_test("creat", test_creat, 2);
+#if (GLIBC_MINOR >= 1)
+  do_test("creat64", test_creat64, 2);
 #endif
-	do_test("fchmod", test_fchmod, 3);
-	do_test("fchown", test_fchown, 3);
-	do_test("fopen",test_fopen,2);
-#if(GLIBC_MINOR >= 1)
-	do_test("fopen64",test_fopen64,2);
-#endif	
-	do_test("ftruncate", test_ftruncate, 3);
-#if(GLIBC_MINOR >= 1)
-	do_test("ftruncate64", test_ftruncate64, 4);
+  do_test("fchmod", test_fchmod, 3);
+  do_test("fchown", test_fchown, 3);
+  do_test("fopen", test_fopen, 2);
+#if (GLIBC_MINOR >= 1)
+  do_test("fopen64", test_fopen64, 2);
 #endif
-	do_test("lchown", test_lchown, 3);
-	do_test("link", test_link, 4);
-	do_test("mkdir", test_mkdir, 2);
-	/* do_test("mknod", test_mknod, 2); */
-	do_test("open", test_open, 2);
-#if(GLIBC_MINOR >= 1)
-	do_test("open64", test_open64, 2);
+  do_test("ftruncate", test_ftruncate, 3);
+#if (GLIBC_MINOR >= 1)
+  do_test("ftruncate64", test_ftruncate64, 4);
 #endif
-	do_test("rename", test_rename, 3);
-	do_test("rmdir", test_mkdir, 2);
-	do_test("symlink", test_symlink, 4);
-	do_test("truncate", test_truncate, 3);
-#if(GLIBC_MINOR >= 1)
-	do_test("truncate64", test_truncate64, 3);
+  do_test("lchown", test_lchown, 3);
+  do_test("link", test_link, 4);
+  do_test("mkdir", test_mkdir, 2);
+  /* do_test("mknod", test_mknod, 2); */
+  do_test("open", test_open, 2);
+#if (GLIBC_MINOR >= 1)
+  do_test("open64", test_open64, 2);
 #endif
-	do_test("unlink", test_unlink, 2);
-#if(GLIBC_MINOR >= 4)
+  do_test("rename", test_rename, 3);
+  do_test("rmdir", test_mkdir, 2);
+  do_test("symlink", test_symlink, 4);
+  do_test("truncate", test_truncate, 3);
+#if (GLIBC_MINOR >= 1)
+  do_test("truncate64", test_truncate64, 3);
+#endif
+  do_test("unlink", test_unlink, 2);
+#if (GLIBC_MINOR >= 4)
   do_test("renameat", test_renameat, 4);
   do_test("linkat", test_linkat, 4);
   do_test("symlinkat", test_symlinkat, 4);
@@ -412,23 +412,22 @@ int main(int argc, char **argv) {
   do_test("unlinkat", test_unlinkat, 2);
 #endif
 #ifdef HAVE_UTIMENSAT
-	do_test("utimensat", test_utimensat, 2);
+  do_test("utimensat", test_utimensat, 2);
 #endif
 #ifdef HAVE_RENAMEAT2
-	do_test("renameat2", test_renameat2, 4);
+  do_test("renameat2", test_renameat2, 4);
 #endif
 
-	putchar('\n');
-	if(failed != 0) {
-		printf("%d tests were not successful!\n", failed);
-		printf("Please email this log to the maintainer with the output of\n");
-		printf("\tnm %s\n", argv[0]);
-	} else
-		printf("All tests successful!\n");
+  putchar('\n');
+  if (failed != 0) {
+    printf("%d tests were not successful!\n", failed);
+    printf("Please email this log to the maintainer with the output of\n");
+    printf("\tnm %s\n", argv[0]);
+  } else
+    printf("All tests successful!\n");
 
-	if(libc_handle!=NULL)
-		dlclose(libc_handle);
+  if (libc_handle != NULL)
+    dlclose(libc_handle);
 
-	return failed;
+  return failed;
 }
-
