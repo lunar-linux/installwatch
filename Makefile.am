@@ -11,7 +11,7 @@ installwatch_la_LIBADD = -ldl -lc
 
 
 check_PROGRAMS = test-installwatch
-test_installwatch_SOURCES = test-installwatch.c
+test_installwatch_SOURCES = test-installwatch.c test-installwatch.h
 test_installwatch_CFLAGS = -Wall -DVERSION=\"$(VERSION)\" -DLIBDIR=\"$(top_builddir)/.libs\"
 test_installwatch_LDADD = -ldl
 
